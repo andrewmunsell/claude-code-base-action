@@ -74,13 +74,13 @@ runs:
   using: "composite"
   steps:
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # https://github.com/actions/setup-node/releases/tag/v4.4.0
       with:
-        node-version: "18.x"
+        node-version: ${{ env.NODE_VERSION || '18.x' }}
         cache: ${{ inputs.use_node_cache == 'true' && 'npm' || '' }}
 
     - name: Install Bun
-      uses: oven-sh/setup-bun@v2
+      uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76 # https://github.com/oven-sh/setup-bun/releases/tag/v2.0.2
       with:
         bun-version: 1.2.11
 
@@ -92,12 +92,17 @@ runs:
 
     - name: Install Claude Code
       shell: bash
-      run: npm install -g @anthropic-ai/claude-code@^1.0.2
+      run: npm install -g @anthropic-ai/claude-code@1.0.6
 
     - name: Run Claude Code Action
       shell: bash
       id: run_claude
       run: |
+        # Change to CLAUDE_WORKING_DIR if set (for running in custom directories)
+        if [ -n "$CLAUDE_WORKING_DIR" ]; then
+          echo "Changing directory to CLAUDE_WORKING_DIR: $CLAUDE_WORKING_DIR"
+          cd "$CLAUDE_WORKING_DIR"
+        fi
         bun run ${{ github.action_path }}/src/index.ts
       env:
         # Model configuration
@@ -113,6 +118,7 @@ runs:
 
         # Provider configuration
         ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key }}
+        ANTHROPIC_BASE_URL: ${{ env.ANTHROPIC_BASE_URL }}
         # Only set provider flags if explicitly true, since any value (including "false") is truthy
         CLAUDE_CODE_USE_BEDROCK: ${{ inputs.use_bedrock == 'true' && '1' || '' }}
         CLAUDE_CODE_USE_VERTEX: ${{ inputs.use_vertex == 'true' && '1' || '' }}
@@ -122,7 +128,7 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
         AWS_SESSION_TOKEN: ${{ env.AWS_SESSION_TOKEN }}
-        ANTHROPIC_BEDROCK_BASE_URL: ${{ env.ANTHROPIC_BEDROCK_BASE_URL }}
+        ANTHROPIC_BEDROCK_BASE_URL: ${{ env.ANTHROPIC_BEDROCK_BASE_URL || (env.AWS_REGION && format('https://bedrock-runtime.{0}.amazonaws.com', env.AWS_REGION)) }}
 
         # GCP configuration
         ANTHROPIC_VERTEX_PROJECT_ID: ${{ env.ANTHROPIC_VERTEX_PROJECT_ID }}

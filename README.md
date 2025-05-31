@@ -62,6 +62,26 @@ Add the following to your workflow file:
 | `conclusion`     | Execution status of Claude Code ('success' or 'failure')   |
 | `execution_file` | Path to the JSON file containing Claude Code execution log |
 
+## Environment Variables
+
+The following environment variables can be used to configure the action:
+
+| Variable       | Description                                           | Default |
+| -------------- | ----------------------------------------------------- | ------- |
+| `NODE_VERSION` | Node.js version to use (e.g., '18.x', '20.x', '22.x') | '18.x'  |
+
+Example usage:
+
+```yaml
+- name: Run Claude Code with Node.js 20
+  uses: anthropics/claude-code-base-action@beta
+  env:
+    NODE_VERSION: "20.x"
+  with:
+    prompt: "Your prompt here"
+    anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+```
+
 ## Using MCP Config
 
 You can provide a custom MCP configuration file to dynamically load MCP servers:
@@ -179,6 +199,8 @@ You can authenticate with Claude using any of these three methods:
 - Bedrock and Vertex use OIDC authentication exclusively
 - AWS Bedrock automatically uses cross-region inference profiles for certain models
 - For cross-region inference profile models, you need to request and be granted access to the Claude models in all regions that the inference profile uses
+- The Bedrock API endpoint URL is automatically constructed using the AWS_REGION environment variable (e.g., `https://bedrock-runtime.us-west-2.amazonaws.com`)
+- You can override the Bedrock API endpoint URL by setting the `ANTHROPIC_BEDROCK_BASE_URL` environment variable
 
 ### Model Configuration
 
@@ -296,7 +318,7 @@ anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
 ```
 
 This applies to all sensitive values including API keys, access tokens, and credentials.
-We also reccomend that you always use short-lived tokens when possible
+We also recommend that you always use short-lived tokens when possible
 
 ## License
 
