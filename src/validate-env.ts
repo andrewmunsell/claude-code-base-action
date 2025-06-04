@@ -29,7 +29,7 @@ export function validateEnvironmentVariables() {
   } else if (useOAuth) {
     const requiredOAuthVars = {
       CLAUDE_ACCESS_TOKEN: process.env.CLAUDE_ACCESS_TOKEN,
-      CLAUDE_REFRESH_TOKEN: process.env.CLAUDE_REFRESH_TOKEN,
+      // CLAUDE_REFRESH_TOKEN: process.env.CLAUDE_REFRESH_TOKEN,
       CLAUDE_EXPIRES_AT: process.env.CLAUDE_EXPIRES_AT,
     };
 
